@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Contact - Sign Language Recognition{% endblock %}
+
+{% block content %}
+<h1>Contact Us</h1>
+
+{% if success %}
+    <p style="color: #7CFC00; font-weight: bold;">Thank you, {{ name }}! Your message has been received.</p>
+{% else %}
+    <form method="post" action="{{ url_for('contact') }}">
+        <label for="name">Name</label>
+        <input type="text" name="name" id="name" placeholder="Your name" required>
+
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" placeholder="Your email" required>
+
+        <label for="message">Message</label>
+        <textarea name="message" id="message" rows="5" placeholder="Write your message here..." required></textarea>
+
+        <button type="submit">Send Message</button>
+    </form>
+{% endif %}
+
+{% endblock %}

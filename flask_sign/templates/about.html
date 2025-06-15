@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}About - Sign Language Recognition{% endblock %}
+
+{% block content %}
+<h1>About Sign Language Recognition</h1>
+<p>
+    This application uses computer vision techniques with MediaPipe and OpenCV to recognize
+    hand gestures corresponding to common sign language signals. The system detects hand landmarks,
+    analyzes finger positions, and maps them to meaningful phrases to assist in communication.
+</p>
+<p>
+    The gestures recognized include simple signs like "Okay", "Dislike", "Victory", "Stop", "Point", "Love", "No", and "Miss You".
+    These have been mapped to natural language meanings to help non-signers understand the conveyed message.
+</p>
+<p>
+    This project aims to bridge communication gaps and promote accessibility using AI-powered tools.
+</p>
+{% endblock %}

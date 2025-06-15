@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Sign Language Recognition{% endblock %}
+
+{% block content %}
+<h1 style="text-align:center;">Sign Language Recognition</h1>
+<div style="text-align:center;">
+    <img src="{{ url_for('video_feed') }}" width="640" height="480" />
+</div>
+<h2 style="text-align:center; margin-top: 15px;">Meaning:</h2>
+<h3 id="gesture" style="text-align:center; font-size: 2em;">None</h3>
+<h4 id="meaning" style="text-align:center; font-size: 1.2em; font-style: italic;"></h4>
+
+<div style="text-align:center; margin-top: 20px;">
+    <button id="playBtn">🔊 Play Meaning</button>
+    <button id="pauseBtn">⏸️ Pause</button>
+</div>
+
+<script>
+    let lastGesture = "";
+    let lastMeaning = "";
+    let hasPlayedForLastGesture = false;
+    let hasPlayedForNoGesture = false;
+    let isPaused = false;
+    let utterance = null;
+
+    async function updateGesture() {
+        const response = await fetch('/current_gesture');
+        const data = await response.json();
+
+        const gestureEl = document.getElementById('gesture');
+        const meaningEl = document.getElementById('meaning');
+
+        if (data.gesture) {
+            if (data.gesture !== lastGesture) {
+                lastGesture = data.gesture;
+                lastMeaning = data.meaning || "";
+
+                gestureEl.innerText = lastGesture;
+                meaningEl.innerText = lastMeaning;
+
+                playSpeech(lastMeaning);
+
+                hasPlayedForNoGesture = false;
+                hasPlayedForLastGesture = true;
+            }
+        } else {
+            gestureEl.innerText = lastGesture || "None";
+            meaningEl.innerText = lastMeaning || "";
+
+            if (!hasPlayedForNoGesture && lastMeaning) {
+                playSpeech(lastMeaning);
+                hasPlayedForNoGesture = true;
+                hasPlayedForLastGesture = false;
+            }
+        }
+    }
+
+    function playSpeech(text) {
+        if (!text) return;
+        window.speechSynthesis.cancel();
+        utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 1;
+        window.speechSynthesis.speak(utterance);
+        isPaused = false;
+    }
+
+    document.getElementById('playBtn').addEventListener('click', () => {
+        if (lastMeaning) {
+            playSpeech(lastMeaning);
+        }
+    });
+
+    document.getElementById('pauseBtn').addEventListener('click', () => {
+        if (speechSynthesis.speaking) {
+            if (!isPaused) {
+                speechSynthesis.pause();
+                isPaused = true;
+                document.getElementById('pauseBtn').innerText = '▶️ Resume';
+            } else {
+                speechSynthesis.resume();
+                isPaused = false;
+                document.getElementById('pauseBtn').innerText = '⏸️ Pause';
+            }
+        }
+    });
+
+    setInterval(updateGesture, 500);
+</script>
+{% endblock %}
